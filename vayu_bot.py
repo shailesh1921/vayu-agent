@@ -288,6 +288,8 @@ async def scheduler():
 
 # ==================== ENTRY POINT ====================
 if __name__ == "__main__":
+    import sys
+    
     # Check env vars
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
         print("❌ Set environment variables:")
@@ -295,10 +297,17 @@ if __name__ == "__main__":
         print("   export TELEGRAM_CHAT_ID='your_chat_id'")
         exit(1)
     
-    print("🤖 VAYU Auto Swing Bot starting...")
-    print(f"📅 Next run: {next_trading_day_open().strftime('%Y-%m-%d %H:%M IST')}")
-    
-    try:
-        asyncio.run(scheduler())
-    except KeyboardInterrupt:
-        print("\n👋 VAYU bot stopped")
+    # One-shot mode for GitHub Actions: python vayu_bot.py --once
+    if "--once" in sys.argv:
+        print("🤖 VAYU One-Shot Analysis...")
+        asyncio.run(run_daily_analysis())
+        print("✅ Done")
+    else:
+        # Scheduler mode for VPS
+        print("🤖 VAYU Auto Swing Bot starting...")
+        print(f"📅 Next run: {next_trading_day_open().strftime('%Y-%m-%d %H:%M IST')}")
+        
+        try:
+            asyncio.run(scheduler())
+        except KeyboardInterrupt:
+            print("\n👋 VAYU bot stopped")
