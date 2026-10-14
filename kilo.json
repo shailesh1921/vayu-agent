@@ -1,0 +1,87 @@
+{
+  "name": "vayu-trading-intelligence",
+  "version": "1.0.0",
+  "description": "Elite Indian stock market trading intelligence agent configuration",
+  "agent": {
+    "name": "vayu",
+    "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "systemPrompt": "vayu.md",
+    "tools": [
+      "websearch",
+      "webfetch",
+      "grep",
+      "glob",
+      "read",
+      "write",
+      "edit",
+      "bash",
+      "task"
+    ],
+    "temperature": 0.1,
+    "maxTokens": 8192
+  },
+  "skills": [
+    "adbc",
+    "adf-master",
+    "agent-md-refactor"
+  ],
+  "commands": {
+    "vayu-analyze": {
+      "description": "Analyze a stock with full VAYU confluence engine",
+      "prompt": "Analyze {symbol} using the full VAYU confluence engine. Provide market context, multi-timeframe technical analysis, fundamental snapshot, institutional flows, sector context, confluence score, and structured trade signal output.",
+      "args": [
+        {
+          "name": "symbol",
+          "type": "string",
+          "description": "NSE/BSE symbol (e.g., RELIANCE, HDFCBANK, STLTECH)",
+          "required": true
+        },
+        {
+          "name": "timeframe",
+          "type": "string",
+          "description": "Trade timeframe",
+          "enum": ["INTRADAY", "1-WEEK_SWING", "2-WEEK_POSITIONAL", "ALL"],
+          "default": "ALL"
+        }
+      ]
+    },
+    "vayu-watchlist": {
+      "description": "Generate daily watchlist with top 5-8 setups",
+      "prompt": "Generate today's VAYU daily watchlist. Screen 200+ stocks (Nifty 50, Next 50, top 100 midcaps). Filter for setups near key levels with volume buildup. Present top 5-8 stocks ranked by confluence score with both long and short setups.",
+      "args": []
+    },
+    "vayu-market-context": {
+      "description": "Get current market context (Nifty, BankNifty, VIX, FII/DII, sector rotation)",
+      "prompt": "Provide current market context: Nifty/BankNifty trend, India VIX level, FII/DII flows, sector rotation heatmap, key levels for the session, and any macro events. Format as VAYU pre-market brief.",
+      "args": []
+    },
+    "vayu-premarket": {
+      "description": "Generate pre-market brief for the trading session",
+      "prompt": "Generate VAYU pre-market brief: GIFT/SGX Nifty gap indication, overnight global cues (US markets, Asia, crude, DXY), FII/DII previous day data, India VIX, stocks with >2% gap on news/results/block deals, key Nifty/BankNifty levels (pivots, PDH/PDL, VWAP), watchlist setups near key levels.",
+      "args": []
+    },
+    "vayu-sector-analysis": {
+      "description": "Analyze sector rotation and relative strength",
+      "prompt": "Analyze sector rotation for Indian markets. Rank sectors by momentum (IT, Banking, Pharma, FMCG, Auto, Metals, Energy, Realty, Infra, Defence, PSU). Identify strongest/weakest sectors. Provide top 3 stocks in strongest sector with VAYU setups.",
+      "args": []
+    }
+  },
+  "permissions": {
+    "allow": [
+      "websearch",
+      "webfetch",
+      "bash",
+      "read",
+      "write",
+      "edit",
+      "grep",
+      "glob",
+      "task"
+    ],
+    "deny": []
+  },
+  "hooks": {
+    "preAnalyze": "vayu-premarket",
+    "postAnalyze": "vayu-market-context"
+  }
+}
