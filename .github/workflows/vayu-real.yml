@@ -1,0 +1,18 @@
+name: VAYU Real Swing Analysis
+on:
+  schedule:
+    - cron: '45 3 * * 1-5'
+  workflow_dispatch:
+jobs:
+  vayu-real:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install yfinance pandas numpy ta aiohttp pytz
+      - run: python vayu_real.py --once
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
